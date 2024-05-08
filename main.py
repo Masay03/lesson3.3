@@ -1,56 +1,72 @@
-#Импортируем pygame
 import pygame
-#Импортируем рандом
 import random
 
-#Инициализируем pygame
+# Инициализируем pygame
 pygame.init()
 
-#Создаем окно и его параметры
+# Создаем окно и его параметры
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-#Создаем названия окна, иконку
+# Создаем названия окна, иконку
 pygame.display.set_caption("Игра Тир")
 icon = pygame.image.load("img/1674667984_grizly-club-p-klipart-tir-2.jpg")
 pygame.display.set_icon(icon)
 
-#Создаем целевой объект
-target_img = pygame.image.load("img/target.com.png")
-target_wiath = 80
-target_heigh = 80
+# Создаем целевой объект
+target_img = pygame.image.load("img/target.com.png")  # Проверьте правильность пути к файлу
+target_width = 80
+target_height = 80
+target_x = random.randint(0, SCREEN_WIDTH - target_width)
+target_y = random.randint(0, SCREEN_HEIGHT - target_height)
+target_speed_x = 0.2
+target_speed_y = 0.2
 
-#Рандомный целевой объект для перемещения
-target_x = random.randint(0, SCREEN_WIDTH - target_wiath)
-target_y = random.randint(0, SCREEN_HEIGHT - target_heigh)
+# Цвет фона и счет
+background_color = (0, 0, 0)  # Черный цвет
+score = 0
 
-#Цвет целевого объекта
-color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+# Шрифт для отображения счета
+font = pygame.font.Font(None, 36)
 
-#Запускаем игру
-runing = True
-while runing:
-    screen.fill(color)#Заливка экрана цветом
-    screen.blit(target_img, (target_x, target_y))#Рисуем целевой объект
-    pygame.display.update()#Обновляем экран
+# Запускаем игру
+running = True
+while running:
+    screen.fill(background_color)  # Заливка экрана цветом
 
-    #Обработка событий
+    # Обновляем позицию цели
+    target_x += target_speed_x
+    target_y += target_speed_y
+
+    # Проверяем, не выходит ли цель за пределы экрана
+    if target_x + target_width > SCREEN_WIDTH or target_x < 0:
+        target_speed_x *= -1
+    if target_y + target_height > SCREEN_HEIGHT or target_y < 0:
+        target_speed_y *= -1
+
+    # Рисуем целевой объект
+    screen.blit(target_img, (target_x, target_y))
+
+    # Отображаем счет
+    score_text = font.render(f"Score: {score}", True, (255, 255, 255))  # Белый цвет текста
+    screen.blit(score_text, (10, 10))
+
+    pygame.display.update()  # Обновляем экран
+
+    # Обработка событий
     for event in pygame.event.get():
-        # Если нажали на крестик
         if event.type == pygame.QUIT:
-            runing = False
-            # Если нажали на мышь
-        if event.type == pygame.MOUSEBUTTONDOWN:#Если нажали мышь
+            running = False
+        if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = pygame.mouse.get_pos()
-            # Если мышь попал в целевой объект
-            if target_x < mouse_x < target_x + target_wiath and target_y < mouse_y < target_y + target_heigh:
-                target_x = random.randint(0, SCREEN_WIDTH - target_wiath)
-                target_y = random.randint(0, SCREEN_HEIGHT - target_heigh)
-                color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+            # Если мышь попала в целевой объект
+            if target_x <= mouse_x <= target_x + target_width and target_y <= mouse_y <= target_y + target_height:
+                score += 1  # Увеличиваем счет
+                target_x = random.randint(0, SCREEN_WIDTH - target_width)
+                target_y = random.randint(0, SCREEN_HEIGHT - target_height)
+                # Меняем цвет фона на случайный
+                background_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
 
-    #Обновляем экран
-    pygame.display.update()
-
-#Закрываем игру
+# Закрываем игру
 pygame.quit()
